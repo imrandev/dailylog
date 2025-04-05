@@ -57,13 +57,12 @@ class HomeController extends GetxController {
     double daysBetween = 0;
     double difference = 0;
 
-    if (data.first.balance > data.last.balance) {
-      if (data.length == 2) return;
+    if (data.length == 3 && data.first.balance > data[data.length - 2].balance) {
       daysBetween = DateFormatUtil.getDaysBetween(DateTime.parse(data.last.createdAt), DateTime.parse(data[data.length - 2].createdAt));
       difference = data.last.balance - data[data.length - 2].balance;
     } else {
-      daysBetween = DateFormatUtil.getDaysBetween(DateTime.parse(data[1].createdAt), DateTime.parse(data[0].createdAt));
-      difference = data.last.balance - data.first.balance;
+      daysBetween = DateFormatUtil.getDaysBetween(DateTime.parse(data[1].createdAt), DateTime.parse(data.first.createdAt));
+      difference = data[1].balance - data.first.balance;
     }
 
     if (difference == 1 && daysBetween == 0) return;
@@ -71,8 +70,8 @@ class HomeController extends GetxController {
     final dailyAverage = (difference / daysBetween).toPrecision(2);
     dailyAverageElectricityCost.value = dailyAverage;
 
-    int d = DateFormatUtil.getDaysBetween(DateTime.parse(data[0].createdAt), DateTime.now()).ceil();
-    estimateDays = (data[0].balance / dailyAverage).floor();
+    int d = DateFormatUtil.getDaysBetween(DateTime.parse(data.first.createdAt), DateTime.now()).ceil();
+    estimateDays = (data.first.balance / dailyAverage).floor();
     estimateDaysToBeContinue.value =  estimateDays - d;
   }
 
