@@ -197,9 +197,9 @@ class _$ElectricityDao extends ElectricityDao {
   }
 
   @override
-  Future<List<ElectricityEntity>> getLastTwoLogs() async {
+  Future<List<ElectricityEntity>> getLastLogs() async {
     return _queryAdapter.queryList(
-        'SELECT * FROM electricity_logs ORDER BY createdAt DESC LIMIT 2',
+        'SELECT * FROM electricity_logs ORDER BY createdAt DESC LIMIT 3',
         mapper: (Map<String, Object?> row) => ElectricityEntity(
             id: row['id'] as int?,
             createdAt: row['createdAt'] as String,

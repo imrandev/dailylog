@@ -22,8 +22,8 @@ abstract class ElectricityDao {
   @Query('DELETE FROM electricity_logs')
   Future<void> deleteAllLogs();
 
-  @Query('SELECT * FROM electricity_logs ORDER BY createdAt DESC LIMIT 2')
-  Future<List<ElectricityEntity>> getLastTwoLogs();
+  @Query('SELECT * FROM electricity_logs ORDER BY createdAt DESC LIMIT 3')
+  Future<List<ElectricityEntity>> getLastLogs();
 
   @Query('DELETE FROM electricity_logs WHERE id = :id')
   Future<void> deleteLogById(int id);
