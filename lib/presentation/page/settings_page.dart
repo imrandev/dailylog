@@ -1,4 +1,5 @@
 import 'package:dailylog/core/utils/date_format_util.dart';
+import 'package:dailylog/presentation/widgets/app_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -67,250 +68,139 @@ class SettingsPage extends StatelessWidget {
   }
 
   void _openAddBalanceForm(BuildContext context){
-    showDialog<String>(
+    AppDialog(
+      titleText: AppLocalization.newBalance.tr,
       context: context,
-      builder: (BuildContext context) => SimpleDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.0),
-        ),
-        clipBehavior: Clip.antiAlias,
-        contentPadding: const EdgeInsets.all(16.0),
-        title: Container(
-          height: 72.0,
-          color: Colors.greenAccent,
-          padding: const EdgeInsets.only(left: 16.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                AppLocalization.newBalance.tr,
-                style: const TextStyle(
-                  color: Colors.black,
-                ),
-              ),
-              IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: const Icon(
-                  Icons.clear,
-                  color: Colors.black,
-                ),
-              ),
-            ],
+      widgets: [
+        Obx(() => TextFormField(
+          controller: _addBalanceTextController,
+          decoration: InputDecoration(
+            hintText: AppLocalization.hintWaterBalanceField.tr,
+            errorText: _controller.logEntryErrorMessage.value,
           ),
-        ),
-        titlePadding: const EdgeInsets.only(
-          left: 0.0,
-          top: 0.0,
-          right: 0.0,
-          bottom: 8.0,
-        ),
-        children: [
-          Obx(() => TextFormField(
-            controller: _addBalanceTextController,
-            decoration: InputDecoration(
-              hintText: AppLocalization.hintWaterBalanceField.tr,
-              errorText: _controller.logEntryErrorMessage.value,
-            ),
-            keyboardType: TextInputType.number,
-            inputFormatters: [
-              FilteringTextInputFormatter.deny(RegExp(r'[ ,-]')),
-            ],
-          )),
-          const SizedBox(height: 8.0,),
-          TextFormField(
-            controller: _datePickerTextController,
-            decoration: InputDecoration(
-              hintText: AppLocalization.hintCalendarField.tr,
-            ),
-            keyboardType: TextInputType.number,
-            readOnly: true,
-            onTap: () {
-              DateFormatUtil.pickDateTime(context, (picked) {
-                _datePickerTextController.text = DateFormatUtil.formatDateTime(picked);
-                _params['createdAt'] = DateFormatUtil.formatDateTime(picked);
-              });
-            },
+          keyboardType: TextInputType.number,
+          inputFormatters: [
+            FilteringTextInputFormatter.deny(RegExp(r'[ ,-]')),
+          ],
+        )),
+        const SizedBox(height: 8.0,),
+        TextFormField(
+          controller: _datePickerTextController,
+          decoration: InputDecoration(
+            hintText: AppLocalization.hintCalendarField.tr,
           ),
-          const SizedBox(height: 32.0,),
-          TextButton(
-            onPressed: () async {
-              _params['balance'] = _addBalanceTextController.value.text;
-              _controller.insertBalance(_params, () {
-                _addBalanceTextController.text = "";
-                _datePickerTextController.text = "";
-                Navigator.pop(context);
-              });
-            },
-            style: TextButton.styleFrom(
-              backgroundColor: Colors.green,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25.0),
-              ),
-            ),
-            child: Text(
-              AppLocalization.submit.tr,
-              style: const TextStyle(
-                color: Colors.white,
-              ),
+          keyboardType: TextInputType.number,
+          readOnly: true,
+          onTap: () {
+            DateFormatUtil.pickDateTime(context, (picked) {
+              _datePickerTextController.text = DateFormatUtil.formatDateTime(picked);
+              _params['createdAt'] = DateFormatUtil.formatDateTime(picked);
+            });
+          },
+        ),
+        const SizedBox(height: 32.0,),
+        TextButton(
+          onPressed: () async {
+            _params['balance'] = _addBalanceTextController.value.text;
+            _controller.insertBalance(_params, () {
+              _addBalanceTextController.text = "";
+              _datePickerTextController.text = "";
+              Navigator.pop(context);
+            });
+          },
+          style: TextButton.styleFrom(
+            backgroundColor: Colors.green,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(25.0),
             ),
           ),
-        ],
-      ),
-    ).then((value) {
+          child: Text(
+            AppLocalization.submit.tr,
+            style: const TextStyle(
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ],
+    ).show((data) {
       _controller.clearLogInput();
     });
   }
 
   void _openAddFamilyForm(BuildContext context){
-    showDialog<String>(
+    AppDialog(
+      titleText: AppLocalization.familyMember.tr,
       context: context,
-      builder: (BuildContext context) => SimpleDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.0),
-        ),
-        clipBehavior: Clip.antiAlias,
-        contentPadding: const EdgeInsets.all(16.0),
-        title: Container(
-          height: 72.0,
-          color: Colors.greenAccent,
-          padding: const EdgeInsets.only(left: 16.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                AppLocalization.familyMember.tr,
-                style: const TextStyle(
-                  color: Colors.black,
-                ),
-              ),
-              IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: const Icon(
-                  Icons.clear,
-                  color: Colors.black,
-                ),
-              ),
-            ],
+      widgets: [
+        Obx(() => TextFormField(
+          controller: _controller.addFamilyTextController,
+          decoration: InputDecoration(
+            hintText: AppLocalization.hintFamilyField.tr,
+            errorText: _controller.logEntryErrorMessage.value,
           ),
+          keyboardType: TextInputType.number,
+          inputFormatters: [
+            FilteringTextInputFormatter.deny(RegExp(r'[ ,-]')),
+          ],
+        )),
+        const SizedBox(height: 32.0,),
+        Text(
+          AppLocalization.noticeFamilyCounter.tr,
         ),
-        titlePadding: const EdgeInsets.only(
-          left: 0.0,
-          top: 0.0,
-          right: 0.0,
-          bottom: 8.0,
-        ),
-        children: [
-          Obx(() => TextFormField(
-            controller: _controller.addFamilyTextController,
-            decoration: InputDecoration(
-              hintText: AppLocalization.hintFamilyField.tr,
-              errorText: _controller.logEntryErrorMessage.value,
-            ),
-            keyboardType: TextInputType.number,
-            inputFormatters: [
-              FilteringTextInputFormatter.deny(RegExp(r'[ ,-]')),
-            ],
-          )),
-          const SizedBox(height: 32.0,),
-          Text(
-            AppLocalization.noticeFamilyCounter.tr,
-          ),
-          const SizedBox(height: 16.0,),
-          TextButton(
-            onPressed: () async {
-              _controller.updateFamily(() {
-                Navigator.pop(context);
-              });
-            },
-            style: TextButton.styleFrom(
-              backgroundColor: Colors.green,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25.0),
-              ),
-            ),
-            child: Text(
-              AppLocalization.submit.tr,
-              style: const TextStyle(
-                color: Colors.white,
-              ),
+        const SizedBox(height: 16.0,),
+        TextButton(
+          onPressed: () async {
+            _controller.updateFamily(() {
+              Navigator.pop(context);
+            });
+          },
+          style: TextButton.styleFrom(
+            backgroundColor: Colors.green,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(25.0),
             ),
           ),
-        ],
-      ),
-    ).then((value) {
+          child: Text(
+            AppLocalization.submit.tr,
+            style: const TextStyle(
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ],
+    ).show((data) {
       _controller.clearLogInput();
     });
   }
 
   void _openResetDialog(BuildContext context){
-    showDialog<String>(
+    AppDialog(
+      titleText: AppLocalization.resetBalance.tr,
       context: context,
-      builder: (BuildContext context) => SimpleDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.0),
-        ),
-        clipBehavior: Clip.antiAlias,
-        contentPadding: const EdgeInsets.all(16.0),
-        title: Container(
-          height: 72.0,
-          color: Colors.greenAccent,
-          padding: const EdgeInsets.only(left: 16.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                AppLocalization.resetBalance.tr,
-                style: const TextStyle(
-                  color: Colors.black,
-                ),
-              ),
-              IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: const Icon(
-                  Icons.clear,
-                  color: Colors.black,
-                ),
-              ),
-            ],
-          ),
-        ),
-        titlePadding: const EdgeInsets.only(
-          left: 0.0,
-          top: 0.0,
-          right: 0.0,
-          bottom: 8.0,
-        ),
-        children: [
-          Text(AppLocalization.hintReset.tr),
-          const SizedBox(height: 32.0,),
-          TextButton(
-            onPressed: () async {
-              _controller.resetBalance(() {
-                Navigator.pop(context);
-              });
-            },
-            style: TextButton.styleFrom(
-              backgroundColor: Colors.green,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25.0),
-              ),
-            ),
-            child: Text(
-              AppLocalization.confirm.tr,
-              style: const TextStyle(
-                color: Colors.white,
-              ),
+      widgets: [
+        Text(AppLocalization.hintReset.tr),
+        const SizedBox(height: 32.0,),
+        TextButton(
+          onPressed: () async {
+            _controller.resetBalance(() {
+              Navigator.pop(context);
+            });
+          },
+          style: TextButton.styleFrom(
+            backgroundColor: Colors.green,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(25.0),
             ),
           ),
-        ],
-      ),
-    ).then((value) {
+          child: Text(
+            AppLocalization.confirm.tr,
+            style: const TextStyle(
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ],
+    ).show((data){
       _controller.clearLogInput();
     });
   }

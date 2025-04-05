@@ -1,3 +1,4 @@
+import 'package:dailylog/presentation/widgets/app_dialog.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -130,120 +131,84 @@ class ElectricityPage extends StatelessWidget {
   }
 
   void _openMeterLogForm(BuildContext context, {ElectricityModel? model}){
-
     if (model != null){
       _electricityLogTextController.text = "${model.balance.value ?? 0.00}";
       _datePickerTextController.text = model.createdAt.value ?? "";
     }
-
-    showDialog<String>(
+    AppDialog(
+      titleText: AppLocalization.entryLog.tr,
       context: context,
-      builder: (BuildContext context) => SimpleDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.0),
+      widgets: [
+        Obx(() => TextFormField(
+          controller: _electricityLogTextController,
+          decoration: InputDecoration(
+            hintText: AppLocalization.hintElectricityField.tr,
+            errorText: _controller.logEntryErrorMessage.value,
+          ),
+          keyboardType: TextInputType.number,
+          inputFormatters: [
+            FilteringTextInputFormatter.deny(RegExp(r'[ ,-]')),
+          ],
+        )),
+        const SizedBox(height: 8.0,),
+        TextFormField(
+          controller: _datePickerTextController,
+          decoration: InputDecoration(
+            hintText: AppLocalization.hintCalendarField.tr,
+          ),
+          keyboardType: TextInputType.number,
+          readOnly: true,
+          onTap: () {
+            DateFormatUtil.pickDateTime(context, selectedDateTime: model?.createdAt.value, (picked) {
+              _datePickerTextController.text = DateFormatUtil.formatDateTime(picked);
+              _params['createdAt'] = DateFormatUtil.formatDateTime(picked);
+            });
+          },
         ),
-        clipBehavior: Clip.antiAlias,
-        contentPadding: const EdgeInsets.all(16.0),
-        title: Container(
-          height: 72.0,
-          color: Colors.greenAccent,
-          padding: const EdgeInsets.only(left: 16.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                AppLocalization.entryLog.tr,
-                style: const TextStyle(
-                  color: Colors.black,
+        const SizedBox(height: 32.0,),
+        TextButton(
+          onPressed: () async {
+            if (model != null){
+              await _controller.updateLog(
+                ElectricityModel(
+                    id: model.id,
+                    balance: _electricityLogTextController.value.text.isNotEmpty
+                        ? double.parse(_electricityLogTextController.value.text)
+                        : null,
+                    createdAt: _datePickerTextController.value.text.isNotEmpty
+                        ? _datePickerTextController.value.text
+                        : DateFormatUtil.formatDateTime(DateTime.now())
                 ),
-              ),
-              IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: const Icon(Icons.clear, color: Colors.black,),
-              ),
-            ],
-          ),
-        ),
-        titlePadding: const EdgeInsets.only(
-          left: 0.0,
-          top: 0.0,
-          right: 0.0,
-          bottom: 8.0,
-        ),
-        children: [
-          Obx(() => TextFormField(
-            controller: _electricityLogTextController,
-            decoration: InputDecoration(
-              hintText: AppLocalization.hintElectricityField.tr,
-              errorText: _controller.logEntryErrorMessage.value,
-            ),
-            keyboardType: TextInputType.number,
-            inputFormatters: [
-              FilteringTextInputFormatter.deny(RegExp(r'[ ,-]')),
-            ],
-          )),
-          const SizedBox(height: 8.0,),
-          TextFormField(
-            controller: _datePickerTextController,
-            decoration: InputDecoration(
-              hintText: AppLocalization.hintCalendarField.tr,
-            ),
-            keyboardType: TextInputType.number,
-            readOnly: true,
-            onTap: () {
-              DateFormatUtil.pickDateTime(context, selectedDateTime: model?.createdAt.value, (picked) {
-                _datePickerTextController.text = DateFormatUtil.formatDateTime(picked);
-                _params['createdAt'] = DateFormatUtil.formatDateTime(picked);
-              });
-            },
-          ),
-          const SizedBox(height: 32.0,),
-          TextButton(
-            onPressed: () async {
-              if (model != null){
-                await _controller.updateLog(
-                    ElectricityModel(
-                        id: model.id,
-                        balance: _electricityLogTextController.value.text.isNotEmpty
-                            ? double.parse(_electricityLogTextController.value.text)
-                            : null,
-                        createdAt: _datePickerTextController.value.text.isNotEmpty
-                            ? _datePickerTextController.value.text
-                            : DateFormatUtil.formatDateTime(DateTime.now())
-                    ),
-                      () {
-                        _electricityLogTextController.text = "";
-                        _datePickerTextController.text = "";
-                        Navigator.popUntil(context, ModalRoute.withName('/meter'),);
-                      },
-                );
-              } else {
-                _params['balance'] = _electricityLogTextController.value.text;
-                _controller.insertLog(_params, () {
+                    () {
                   _electricityLogTextController.text = "";
                   _datePickerTextController.text = "";
-                  Navigator.pop(context);
-                });
-              }
-            },
-            style: TextButton.styleFrom(
-              backgroundColor: Colors.green,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25.0),
-              ),
-            ),
-            child: Text(
-              AppLocalization.submit.tr,
-              style: const TextStyle(
-                color: Colors.white,
-              ),
+                  Navigator.popUntil(context, ModalRoute.withName('/meter'),);
+                },
+              );
+            } else {
+              _params['balance'] = _electricityLogTextController.value.text;
+              _controller.insertLog(_params, () {
+                _electricityLogTextController.text = "";
+                _datePickerTextController.text = "";
+                Navigator.pop(context);
+              });
+            }
+          },
+          style: TextButton.styleFrom(
+            backgroundColor: Colors.green,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(25.0),
             ),
           ),
-        ],
-      ),
-    ).then((value) {
+          child: Text(
+            AppLocalization.submit.tr,
+            style: const TextStyle(
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ],
+    ).show((data){
       _controller.clearLogInput();
     });
   }
@@ -277,9 +242,6 @@ class ElectricityPage extends StatelessWidget {
           ],
         ),
       ),
-      // Optional parameters
-      isScrollControlled: true,
-      enableDrag: true,
     );
   }
 
