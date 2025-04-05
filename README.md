@@ -2,7 +2,7 @@
 
 # Technology
 * Material3 design.
-* Maintain offline database with floor package.
+* Maintain offline database using floor package.
 * GetX for state management, navigation routes and dependency injection.
 * Language support.
 
