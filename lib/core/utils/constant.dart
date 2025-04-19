@@ -4,6 +4,8 @@ class Constant {
 
   static const String familyMember = "family_member";
 
+  static const String pricePerLiter = "price_per_liter";
+
   static const String bangla = "bn";
 
   static const String english = "en";

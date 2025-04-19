@@ -15,7 +15,9 @@ class SessionManager {
 
   set familyMember(int? member) => _prefManager.saveInt(Constant.familyMember, member ?? 1);
 
-  void clearSession(){
+  double? get pricePerLitre => _prefManager.getDoubleValue(Constant.pricePerLiter) ?? Constant.perLitrePrice;
 
-  }
+  set pricePerLitre(double? member) => _prefManager.saveDouble(Constant.pricePerLiter, member);
+
+  void clearSession(){}
 }

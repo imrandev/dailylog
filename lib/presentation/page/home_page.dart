@@ -387,7 +387,9 @@ class HomePage extends StatelessWidget {
         });
         break;
       case AppLocalization.settings:
-        Get.toNamed(RoutePaths.settings);
+        Get.toNamed(RoutePaths.settings)?.then((value) {
+          _controller.fetchDashboard();
+        });
         break;
       default:
         Get.snackbar(AppLocalization.newFeature.tr, AppLocalization.comingSoon.tr);

@@ -172,13 +172,14 @@ class _$ElectricityDao extends ElectricityDao {
   final DeletionAdapter<ElectricityEntity> _electricityEntityDeletionAdapter;
 
   @override
-  Future<List<ElectricityEntity>> getAllLogs() async {
+  Future<List<ElectricityEntity>> getAllLogs(int limit) async {
     return _queryAdapter.queryList(
-        'SELECT * FROM electricity_logs ORDER BY createdAt DESC LIMIT 20',
+        'SELECT * FROM electricity_logs ORDER BY createdAt DESC LIMIT ?1',
         mapper: (Map<String, Object?> row) => ElectricityEntity(
             id: row['id'] as int?,
             createdAt: row['createdAt'] as String,
-            balance: row['balance'] as double));
+            balance: row['balance'] as double),
+        arguments: [limit]);
   }
 
   @override
@@ -276,13 +277,14 @@ class _$GasDao extends GasDao {
   final DeletionAdapter<GasEntity> _gasEntityDeletionAdapter;
 
   @override
-  Future<List<GasEntity>> getAllLogs() async {
+  Future<List<GasEntity>> getAllLogs(int limit) async {
     return _queryAdapter.queryList(
-        'SELECT * FROM gas_logs ORDER BY createdAt DESC LIMIT 20',
+        'SELECT * FROM gas_logs ORDER BY createdAt DESC LIMIT ?1',
         mapper: (Map<String, Object?> row) => GasEntity(
             id: row['id'] as int?,
             createdAt: row['createdAt'] as String,
-            price: row['price'] as double));
+            price: row['price'] as double),
+        arguments: [limit]);
   }
 
   @override
@@ -413,6 +415,16 @@ class _$WaterPumpDao extends WaterPumpDao {
   Future<List<WaterPumpEntity>> getLastTwoLogs() async {
     return _queryAdapter.queryList(
         'SELECT * FROM water_pump_logs ORDER BY createdAt DESC LIMIT 2',
+        mapper: (Map<String, Object?> row) => WaterPumpEntity(
+            id: row['id'] as int?,
+            createdAt: row['createdAt'] as String,
+            amount: row['amount'] as double));
+  }
+
+  @override
+  Future<WaterPumpEntity?> getLastLog() async {
+    return _queryAdapter.query(
+        'SELECT * FROM water_pump_logs ORDER BY createdAt DESC LIMIT 1',
         mapper: (Map<String, Object?> row) => WaterPumpEntity(
             id: row['id'] as int?,
             createdAt: row['createdAt'] as String,

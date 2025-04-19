@@ -16,7 +16,7 @@ class WaterAtmEntity {
 
   final String createdAt;
 
-  final double balance;
+  double balance;
 
   @ColumnInfo(name: 'water_pump_id')
   final int? waterPumpId;

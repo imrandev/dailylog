@@ -4,8 +4,8 @@ import 'package:dailylog/data/database/entity/gas_entity.dart';
 @dao
 abstract class GasDao {
 
-  @Query('SELECT * FROM gas_logs ORDER BY createdAt DESC LIMIT 20')
-  Future<List<GasEntity>> getAllLogs();
+  @Query('SELECT * FROM gas_logs ORDER BY createdAt DESC LIMIT :limit')
+  Future<List<GasEntity>> getAllLogs(int limit);
 
   @Query('SELECT * FROM gas_logs WHERE id = :id')
   Future<GasEntity?> getLogById(int id);

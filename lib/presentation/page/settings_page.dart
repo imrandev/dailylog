@@ -62,6 +62,14 @@ class SettingsPage extends StatelessWidget {
                 ? AppLocalization.peoples.tr
                 : AppLocalization.people.tr}")),
           ),
+          ListTile(
+            onTap: () {
+              _openAddFamilyForm(context);
+            },
+            leading: const Icon(Icons.attach_money),
+            title: Text(AppLocalization.pricePerLitre.tr),
+            subtitle: Obx(() => Text("${_controller.pricePerLitre.value} ${AppLocalization.tk.tr}")),
+          ),
         ],
       ),
     );
@@ -151,6 +159,52 @@ class SettingsPage extends StatelessWidget {
         TextButton(
           onPressed: () async {
             _controller.updateFamily(() {
+              Navigator.pop(context);
+            });
+          },
+          style: TextButton.styleFrom(
+            backgroundColor: Colors.green,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(25.0),
+            ),
+          ),
+          child: Text(
+            AppLocalization.submit.tr,
+            style: const TextStyle(
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ],
+    ).show((data) {
+      _controller.clearLogInput();
+    });
+  }
+
+  void _openLitrePriceForm(BuildContext context){
+    AppDialog(
+      titleText: AppLocalization.familyMember.tr,
+      context: context,
+      widgets: [
+        Obx(() => TextFormField(
+          controller: _controller.litrePerPriceTextController,
+          decoration: InputDecoration(
+            hintText: AppLocalization.hintLitrePriceField.tr,
+            errorText: _controller.logEntryErrorMessage.value,
+          ),
+          keyboardType: TextInputType.number,
+          inputFormatters: [
+            FilteringTextInputFormatter.deny(RegExp(r'[ ,-]')),
+          ],
+        )),
+        const SizedBox(height: 32.0,),
+        Text(
+          AppLocalization.noticeLitrePrice.tr,
+        ),
+        const SizedBox(height: 16.0,),
+        TextButton(
+          onPressed: () async {
+            _controller.updateLitrePerPrice(() {
               Navigator.pop(context);
             });
           },

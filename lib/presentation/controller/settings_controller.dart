@@ -19,6 +19,8 @@ class SettingsController extends GetxController {
 
   RxInt familyMemberCount = 1.obs;
 
+  RxDouble pricePerLitre = 0.0.obs;
+
   RxnString logEntryErrorMessage = RxnString();
 
   RxnString lastResetDate = RxnString();
@@ -27,10 +29,13 @@ class SettingsController extends GetxController {
 
   final addFamilyTextController = TextEditingController();
 
+  final litrePerPriceTextController = TextEditingController();
+
   @override
   void onInit() {
     super.onInit();
     familyMemberCount = RxInt(_sessionManager.familyMember ?? 1);
+    pricePerLitre = RxDouble(_sessionManager.pricePerLitre ?? Constant.perLitrePrice);
     addFamilyTextController.text = "${familyMemberCount.value}";
     isBangla.value = _sessionManager.prefLanguage == Constant.bangla;
     _getLastWaterATMBalance();
@@ -44,27 +49,23 @@ class SettingsController extends GetxController {
 
   void _getLastWaterATMBalance() async {
     final data = await _database.waterAtmDao.getLastBalance();
-    if (data != null){
-      lastWaterAtmBalance.value = data.balance;
-      lastResetDate.value = data.createdAt;
-    }
+    lastWaterAtmBalance.value = data?.balance.toPrecision(2) ?? 0.0;
+    lastResetDate.value = data?.createdAt;
   }
 
-  Future<void> insertBalance(Map<String, dynamic> input, Function() callback, {int? id}) async {
+  Future<void> insertBalance(Map<String, dynamic> input, Function() callback) async {
     if (!input.containsKey("balance") || input['balance'].toString().isEmpty){
       logEntryErrorMessage.value = AppLocalization.errorWaterAtmBalance.tr;
       return;
     }
     clearLogInput();
     double balance = double.parse(input['balance']);
-    final data = await _database.waterAtmDao.getAllLogs();
-    if (data.isNotEmpty){
-      final data = await _database.waterAtmDao.getLastBalance();
-      balance = (data?.balance ?? 0) + double.parse(input['balance']);
+    final data = await _database.waterAtmDao.getLastBalance();
+    if (data != null){
+      balance = (data.balance) + double.parse(input['balance']);
     }
     await _database.waterAtmDao.insertLog(
         WaterAtmEntity(
-          waterPumpId: id,
           createdAt: input.containsKey("createdAt")
               ? input['createdAt']
               : DateFormatUtil.formatDateTime(DateTime.now()),
@@ -86,6 +87,16 @@ class SettingsController extends GetxController {
     }
     session.familyMember = int.parse(data);
     familyMemberCount.value = int.parse(data);
+    callback();
+  }
+
+  void updateLitrePerPrice(Function() callback) {
+    final data = litrePerPriceTextController.value.text;
+    if (data.isEmpty) {
+      logEntryErrorMessage.value = AppLocalization.errorLitrePerPrice.tr;
+    }
+    session.pricePerLitre = double.parse(data);
+    pricePerLitre.value = double.parse(data);
     callback();
   }
 

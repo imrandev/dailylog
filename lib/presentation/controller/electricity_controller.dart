@@ -16,7 +16,7 @@ class ElectricityController extends LogController<ElectricityModel, int> {
 
   @override
   Future<void> getLogs() async {
-    final data = await database.electricityDao.getAllLogs();
+    final data = await database.electricityDao.getAllLogs(10);
     final model = data.map((entity) => ElectricityModel(id: entity.id, createdAt: entity.createdAt, balance: entity.balance)).toList();
     logList.addAll(model);
     _getChartData();

@@ -16,7 +16,7 @@ class GasController extends LogController<GasModel, int> {
 
   @override
   Future<void> getLogs() async {
-    final data = await database.gasDao.getAllLogs();
+    final data = await database.gasDao.getAllLogs(10);
     final model = data.map((e) => GasModel(id: e.id, createdAt: e.createdAt, price: e.price)).toList();
     logList.addAll(model);
     _getChartData();

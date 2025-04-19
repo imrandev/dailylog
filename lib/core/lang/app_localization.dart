@@ -8,6 +8,8 @@ class AppLocalization {
 
   static const familyMember = "Family_Member";
 
+  static const pricePerLitre = "Price_Per_Litre";
+
   static const lastAverageMonthlyCost = "Last_Monthly_Average_Cost";
 
   static const dailyWaterIntake = "Daily_Water_Intake";
@@ -52,6 +54,8 @@ class AppLocalization {
 
   static const String hintFamilyField = "Enter_family_member*";
 
+  static const String hintLitrePriceField = "Enter_per_liter_price*";
+
   static const String hintCalendarField = "Pick_date_and_time";
 
   static const String edit = "Edit";
@@ -78,6 +82,8 @@ class AppLocalization {
 
   static const errorFamilyMember = "Family_member_cannot_be_empty.";
 
+  static const errorLitrePerPrice = "Litre_per_price_cannot_be_empty.";
+
   static const defaultLanguage = "English";
 
   static const people = "People";
@@ -87,4 +93,8 @@ class AppLocalization {
   static const hintReset = "Are_you_sure?_This_operation_will_delete_all_the_balance_logs_and_reset_the_water_ATM_balance_to_0";
 
   static const noticeFamilyCounter = "This_information_will_be_used_to_calculate_daily_water_intake.";
+
+  static const noticeLitrePrice = "This_information_will_be_used_to_calculate_possible_water_ATM_balance.";
+
+  static const noticeWaterAtmBalance = "No_balance_found_, _please_go_to_settings_and_add_water_ATM_balance.";
 }

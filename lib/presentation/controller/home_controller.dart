@@ -88,7 +88,7 @@ class HomeController extends GetxController {
   void _getLastWaterATMBalance() async {
     final data = await _database.waterAtmDao.getLastBalance();
     if (data != null){
-      lastWaterAtmBalance.value = data.balance;
+      lastWaterAtmBalance.value = data.balance.toPrecision(2);
     }
   }
 

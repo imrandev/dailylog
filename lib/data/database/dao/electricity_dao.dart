@@ -4,8 +4,8 @@ import 'package:dailylog/data/database/entity/electricity_entity.dart';
 @dao
 abstract class ElectricityDao {
 
-  @Query('SELECT * FROM electricity_logs ORDER BY createdAt DESC LIMIT 20')
-  Future<List<ElectricityEntity>> getAllLogs();
+  @Query('SELECT * FROM electricity_logs ORDER BY createdAt DESC LIMIT :limit')
+  Future<List<ElectricityEntity>> getAllLogs(int limit);
 
   @Query('SELECT * FROM electricity_logs WHERE id = :id')
   Future<ElectricityEntity?> getLogById(int id);

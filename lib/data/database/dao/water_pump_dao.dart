@@ -27,4 +27,7 @@ abstract class WaterPumpDao {
 
   @Query('SELECT * FROM water_pump_logs ORDER BY createdAt DESC LIMIT 2')
   Future<List<WaterPumpEntity>> getLastTwoLogs();
+
+  @Query('SELECT * FROM water_pump_logs ORDER BY createdAt DESC LIMIT 1')
+  Future<WaterPumpEntity?> getLastLog();
 }

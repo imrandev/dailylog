@@ -1,4 +1,5 @@
 import 'package:dailylog/core/lang/app_localization.dart';
+import 'package:dailylog/core/session/session_manager.dart';
 import 'package:dailylog/core/utils/constant.dart';
 import 'package:dailylog/data/database/entity/water_atm_entity.dart';
 import 'package:dailylog/data/database/entity/water_pump_entity.dart';
@@ -15,6 +16,8 @@ class WaterPumpController extends LogController<WaterPumpModel, int> {
   final chartData = [].obs;
 
   RxnString logEntryErrorMessage = RxnString();
+
+  final _sessionManager = Get.find<SessionManager>();
 
   @override
   Future<void> getLogs() async {
@@ -49,36 +52,31 @@ class WaterPumpController extends LogController<WaterPumpModel, int> {
           amount: double.parse(input['amount']),
         )
     );
-    await _insertBalance(
-      {
-        "balance": "${- (double.parse(input['amount']) * Constant.perLitrePrice)}"
-      }, () {
-        callback();
-    }, id: id);
+    await _insertBalance(id);
+    callback();
   }
 
-  Future<void> _insertBalance(Map<String, dynamic> input, Function() callback, {int? id}) async {
-    if (!input.containsKey("balance") || input['balance'].toString().isEmpty){
-      logEntryErrorMessage.value = AppLocalization.errorWaterAtmBalance.tr;
+  Future<void> _insertBalance(int? id) async {
+    final lastData = await database.waterAtmDao.getLastBalance();
+    if (lastData == null){
+      logEntryErrorMessage.value = AppLocalization.noticeWaterAtmBalance.tr;
       return;
     }
-    clearLogInput();
-    double balance = double.parse(input['balance']);
-    final data = await database.waterAtmDao.getAllLogs();
-    if (data.isNotEmpty){
-      final data = await database.waterAtmDao.getLastBalance();
-      balance = (data?.balance ?? 0) + double.parse(input['balance']);
+    final data = await database.waterPumpDao.getLastLog();
+    final price = (data?.amount ?? 0.0) * (_sessionManager.pricePerLitre ?? Constant.perLitrePrice);
+    final lastBalance = await database.waterAtmDao.getLastBalance();
+    if ((lastBalance?.balance ?? 0) < 1){
+      logEntryErrorMessage.value = AppLocalization.noticeWaterAtmBalance.tr;
+      return;
     }
+    final balance = (lastBalance?.balance ?? 0) - price;
     await database.waterAtmDao.insertLog(
         WaterAtmEntity(
           waterPumpId: id,
-          createdAt: input.containsKey("createdAt")
-              ? input['createdAt']
-              : DateFormatUtil.formatDateTime(DateTime.now()),
+          createdAt: DateFormatUtil.formatDateTime(DateTime.now()),
           balance: balance,
         )
     );
-    callback();
   }
 
   void clearLogInput(){
@@ -88,7 +86,7 @@ class WaterPumpController extends LogController<WaterPumpModel, int> {
   @override
   Future<void> updateLog(WaterPumpModel obj, Function() callback) async {
     if (obj.amount.value == null){
-      logEntryErrorMessage.value = AppLocalization.errorGasPrice.tr;
+      logEntryErrorMessage.value = AppLocalization.errorWaterPumpAmount.tr;
       return;
     }
     if (obj.id == null) return;
@@ -100,6 +98,8 @@ class WaterPumpController extends LogController<WaterPumpModel, int> {
         )
     );
     await database.waterAtmDao.deleteLogById(obj.id ?? 0);
+    await _insertBalance(obj.id);
+
     int index = logList.indexWhere((element) => element.id == obj.id);
     logList[index].amount.value = obj.amount.value;
     logList[index].createdAt.value = obj.createdAt.value;
